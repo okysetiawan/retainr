@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000" # Minio API
+      - "9090:9090" # Minio Web UI (Admin Console)
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: supersecretpassword
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9090"
+  nats:
+    image: 'nats:2.6.6-alpine'
+    expose:
+      - "4222:4222"
+      - "8222:8222"
+    ports:
+      - "8222:8222"
+      - "4222:4222"
+
+volumes:
+  minio-data:
