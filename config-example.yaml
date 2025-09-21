@@ -1,0 +1,8 @@
+nats:
+  servers:
+    - http://0.0.0.0:4222
+jobs:
+  - topic: test
+    format: json
+    path: archival/{{ .Date }}/test_{{ .Hour }}.log
+    buffer_size: 10000
