@@ -45,12 +45,11 @@ func (s *Service) ArchiveHourly(ctx context.Context, req *Request) error {
 			if err := req.Destination.PutReader(uploadContext, file.Path(), file); err != nil {
 				s.logger.With("error", err, "path", file.Path()).Warn("failed to put reader")
 			}
-			_ = file.Close()
+			_ = file.Destroy()
 		}
 		close(done)
 	}()
 
-	worker.Stop()
 	<-done
 
 	return nil

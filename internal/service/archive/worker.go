@@ -32,9 +32,6 @@ func (w *WorkerHourly) Start(ctx context.Context) {
 	w.logger.Info("[worker] started")
 	w.running.Store(true)
 	go func() {
-		for msg := range w.msgCh {
-			w.send(msg)
-		}
 		select {
 		case msg := <-w.msgCh:
 			w.send(msg)
@@ -72,7 +69,7 @@ func (w *WorkerHourly) RelayFile(timestamp time.Time) {
 		w.currentBucket.Store(&newBucket)
 	}
 	currBucket := *w.currentBucket.Load()
-	if currBucket == newBucket {
+	if currBucket == newBucket && w.currentFile.Load() != nil {
 		return
 	}
 
@@ -93,7 +90,7 @@ func (w *WorkerHourly) RelayFile(timestamp time.Time) {
 func (w *WorkerHourly) send(msg Message) {
 	w.RelayFile(msg.Timestamp)
 	writer := w.currentFile.Load()
-	msgToBeWrite := fmt.Sprintf("%s - %s", msg.Timestamp.Format(time.RFC3339Nano), msg.Msg)
+	msgToBeWrite := fmt.Sprintf("%s - %s\n", msg.Timestamp.Format(time.RFC3339Nano), msg.Msg)
 	if _, err := writer.WriteString(msgToBeWrite); err != nil {
 		w.logger.With("error", err).Error("[worker] unable to write to file")
 	}

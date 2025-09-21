@@ -3,7 +3,7 @@ version: "3.8"
 services:
   minio:
     image: quay.io/minio/minio
-    container_name: minio
+    container_name: retainr-minio
     ports:
       - "9000:9000" # Minio API
       - "9090:9090" # Minio Web UI (Admin Console)
@@ -15,6 +15,7 @@ services:
     command: server /data --console-address ":9090"
   nats:
     image: 'nats:2.6.6-alpine'
+    container_name: retainr-nats
     expose:
       - "4222:4222"
       - "8222:8222"

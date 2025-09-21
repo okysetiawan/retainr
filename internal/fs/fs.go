@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 type FileSystem struct {
@@ -24,7 +25,16 @@ func (fs *FileSystem) Path() string {
 	return fs.File.Name()
 }
 
+func (fs *FileSystem) Destroy() error {
+	_ = fs.File.Close()
+	return os.Remove(fs.File.Name())
+}
+
 func New(path string) (*FileSystem, error) {
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return nil, err
+	}
+
 	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return nil, err
